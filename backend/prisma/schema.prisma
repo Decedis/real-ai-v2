@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  agentId   Int?
+  agent     Agent?   @relation(fields: [agentId], references: [id])
+  tag       String?  // 'selling', 'buying', or 'other'
+
+  formSubmissions FormSubmission[]
+  
+  NotesOnClient NotesOnClient[]
+}
+
+model Agent {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  clients   Client[]
+  listings  Listing[]
+
+  NotesOnClient NotesOnClient[]
+}
+
+model NotesOnClient {
+    id        Int      @id @default(autoincrement())
+    note      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+    client    Client?   @relation(fields: [clientId], references: [id])
+    clientId  Int?
+    agent     Agent?   @relation(fields: [agentId], references: [id])
+    agentId   Int?
+}
+
+model FormSubmission {
+  id        Int      @id @default(autoincrement())
+  name      String
+  content   String
+  email     String   
+  createdAt DateTime @default(now())
+  client    Client?   @relation(fields: [clientId], references: [id])
+  clientId  Int?
+}
+
+model Listing {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  address     String
+  size        Int
+  price       Int
+  beds        Int
+  baths       Int
+  description String
+  agent       Agent?   @relation(fields: [agentId], references: [id])
+  agentId     Int?
+}
+
+// //AI Stuff
+model GeneratedDocuments {
+  id Int @id @default(autoincrement())
+  content String
+  createdAt DateTime @default(now())
+}
