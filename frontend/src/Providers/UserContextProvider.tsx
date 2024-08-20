@@ -1,4 +1,4 @@
-import {
+import React, {
   createContext,
   Dispatch,
   SetStateAction,
@@ -11,21 +11,23 @@ type TUserContext = {
   setUserContext: Dispatch<SetStateAction<"client" | "agent">>;
 };
 
-const defaultContext: TUserContext = {
-  userContext: "client",
-  setUserContext: () => {},
-};
+export const UserContext = createContext<TUserContext>({} as TUserContext);
 
-export const UserContext = createContext<TUserContext>(defaultContext);
-const UserContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [userContext, setUserContext] = useState<"client" | "agent">("client");
+export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  // Initialize userContext from localStorage directly
+  const [userContext, setUserContext] = useState<"client" | "agent">(() => {
+    const storedUserContext = localStorage.getItem("userContext");
+    return storedUserContext === "client" || storedUserContext === "agent"
+      ? storedUserContext
+      : "client";
+  });
 
   useEffect(() => {
-    const userContext = localStorage.getItem("userContext"); //TODO update
-    if (userContext) {
-      setUserContext(userContext as "client" | "agent");
-    }
-  }, []);
+    // Sync localStorage whenever userContext changes
+    localStorage.setItem("userContext", userContext);
+  }, [userContext]);
 
   return (
     <UserContext.Provider value={{ userContext, setUserContext }}>
@@ -33,4 +35,5 @@ const UserContextProvider = ({ children }: { children: React.ReactNode }) => {
     </UserContext.Provider>
   );
 };
+
 export default UserContextProvider;

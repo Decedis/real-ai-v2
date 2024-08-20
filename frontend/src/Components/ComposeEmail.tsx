@@ -14,21 +14,22 @@ export function ComposeEmail() {
     queryKey: ["clientSubmissions"],
   });
   const [draft, setDraft] = useState("");
+  const { data: generatedDraft, isLoading: isDraftLoading } = useQuery({
+    queryFn: () => generateEmail(parseInt(clientID!)),
+    queryKey: ["generatedDraft"],
+  });
 
   console.log("clientID", clientID);
 
   useEffect(() => {
-    const generateEmailAsync = async () => {
-      if (clientID !== null) {
-        const generatedEmail = await generateEmail(parseInt(clientID));
-        setDraft(generatedEmail.email);
-      }
-      console.log("draft", draft);
-    };
-    console.log("generateEmailAsync", generateEmailAsync.name);
-    generateEmailAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clientID]);
+    if (isDraftLoading) {
+      setDraft("Loading...");
+    }
+    if (generatedDraft) {
+      setDraft(generatedDraft.email);
+    }
+    console.log("generatedDraft", generatedDraft);
+  }, [generatedDraft, isDraftLoading]);
 
   if (isLoading) {
     return <>...Loading</>;
@@ -84,8 +85,11 @@ export function ComposeEmail() {
             key={index}
           >
             <div>{submission.content}</div>
-            <div className="border-b-orange-500 border-b-2 w-1/6 p-2">
+            <div className="border-b-orange-500 border-b-2 w-1/6 p-2 inline-block mr-4">
               - {submission.name}
+            </div>
+            <div className="border-b-2 border-violet-400 inline-block p-2">
+              {submission.createdAt}
             </div>
           </div>
         ))}

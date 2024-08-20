@@ -3,6 +3,7 @@ import { UserContext } from "../Providers/UserContextProvider.tsx";
 
 export const UserContextButton = () => {
   const { userContext, setUserContext } = useContext(UserContext);
+  const displayText = userContext === "client" ? "Client" : "Agent";
 
   return (
     <button
@@ -15,7 +16,7 @@ export const UserContextButton = () => {
         setUserContext((prev) => (prev === "client" ? "agent" : "client"))
       }
     >
-      {userContext}
+      {displayText}
     </button>
   );
 };

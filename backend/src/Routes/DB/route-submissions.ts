@@ -58,6 +58,9 @@ export const routeGetSubmissions = async (c: Context) => {
   let submissions;
   if (clientId) {
     submissions = await prisma.formSubmission.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       where: { clientId: parseInt(clientId) },
       include: { client: true },
     });
